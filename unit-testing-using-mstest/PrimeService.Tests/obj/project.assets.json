@@ -393,6 +393,16 @@
             "related": ".xml"
           }
         }
+      },
+      "PrimeService/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/PrimeService.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/PrimeService.dll": {}
+        }
       }
     }
   },
@@ -1058,6 +1068,11 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "PrimeService/1.0.0": {
+      "type": "project",
+      "path": "../PrimeService/PrimeService.csproj",
+      "msbuildProject": "../PrimeService/PrimeService.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -1065,6 +1080,7 @@
       "MSTest.TestAdapter >= 3.0.4",
       "MSTest.TestFramework >= 3.0.4",
       "Microsoft.NET.Test.Sdk >= 17.6.0",
+      "PrimeService >= 1.0.0",
       "coverlet.collector >= 6.0.0"
     ]
   },
@@ -1092,7 +1108,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/home/andrew/Documents/cs/unit-testing-using-mstest/PrimeService/PrimeService.csproj": {
+              "projectPath": "/home/andrew/Documents/cs/unit-testing-using-mstest/PrimeService/PrimeService.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

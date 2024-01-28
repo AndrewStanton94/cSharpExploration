@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "OcJd5o7KUidmy3JaY2DYH0FPgnVZ60VTg9sUnOsK5/+jlkIouCehjw4pfG8omqGpMoVXbWMruLSyB+HWMzdMsw==",
+  "dgSpecHash": "IPFp0IYmtwkBE4gxIsnubw2yxWJOywjX+SgF3La+1h1eX92Riw37Xw/yLBXyoTDUdQqpRNc739HQqPlfQwzVsw==",
   "success": true,
   "projectFilePath": "/home/andrew/Documents/cs/unit-testing-using-mstest/PrimeService.Tests/PrimeService.Tests.csproj",
   "expectedPackageFiles": [
