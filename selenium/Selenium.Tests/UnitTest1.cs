@@ -1,8 +1,7 @@
-using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.DevTools.V119.HeadlessExperimental;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 
 namespace Selenium.Tests;
@@ -37,7 +36,7 @@ public class UnitTest1
     //     // driver.Quit();
     // }
 
-    [TestMethod]
+    // [TestMethod]
     public void TestMethodP()
     {
         // Select browser by commenting out the unwanted driver
@@ -86,38 +85,76 @@ public class UnitTest1
         // driver.Quit();
     }
 
-    [TestMethod]
+    //[TestMethod]
     public async Task ConsoleLogs()
     {
         // An attempt to find issues with third-party cookies by stopping them and see what's in the console
-	// This didn't work as the errors aren't included
-	// There is support for cookies so this could be handled by investigating at a lower level
+        // This didn't work as the errors aren't included
+        // There is support for cookies so this could be handled by investigating at a lower level
 
-	// https://www.selenium.dev/documentation/webdriver/browsers/chrome/
+        // https://www.selenium.dev/documentation/webdriver/browsers/chrome/
         var options = new ChromeOptions();
-	options.AddArgument("--start-maximized");
-	options.AddArgument("--test-third-party-cookie-phaseout");
+        options.AddArgument("--start-maximized");
+        options.AddArgument("--test-third-party-cookie-phaseout");
         IWebDriver driver = new ChromeDriver(options);
         // IWebDriver driver = new FirefoxDriver();
         // Start at the homepage
         driver.Navigate().GoToUrl("https://www.port.ac.uk");
 
-	// https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk//examples/dotnet/SeleniumDocs/Bidirectional/ChromeDevtools/BidiApiTest.cs#L85-L92
+        // https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk//examples/dotnet/SeleniumDocs/Bidirectional/ChromeDevtools/BidiApiTest.cs#L85-L92
         using IJavaScriptEngine monitor = new JavaScriptEngine(driver);
         var messages = new List<string>();
         monitor.JavaScriptConsoleApiCalled += (_, e) =>
         {
             messages.Add(e.MessageContent);
-	    Console.WriteLine(e.MessageContent);
+            Console.WriteLine(e.MessageContent);
+            // This shows the messages live in the debug pannel as long as you debug the tests: Tests -> Debug
+            System.Diagnostics.Debug.WriteLine(e.MessageContent);
         };
 
         await monitor.StartEventMonitoring();
         // driver.FindElement(By.Id("consoleLog")).Click();
         // driver.FindElement(By.Id("consoleError")).Click();
-        new WebDriverWait(driver, TimeSpan.FromSeconds(60 * 5)).Until(_ => messages.Count > 50);
+        new WebDriverWait(driver, TimeSpan.FromSeconds(60 * 2)).Until(_ => messages.Count > 25);
         monitor.StopEventMonitoring();
 
         Assert.IsTrue(false);
         driver.Quit();
+    }
+
+    [TestMethod]
+    public void GetCookies()
+    {
+        IWebDriver driver = new ChromeDriver();
+        // Without this line it will give up immediately
+        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(45);
+        try
+        {
+            driver.Navigate().GoToUrl("https://www.port.ac.uk");
+
+            var cookieConsentButton = By.CssSelector("#top-of-site > div.cookiefirst-root.notranslate > div > div > div.cfAdwL.cf7ddU > div.cf2L3T.cfysV4.cf3l36 > div.cf3Tgk.cf2pAE.cfAdwL.cf1IKf > div:nth-child(1) > button");
+
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+            IWebElement revealed = driver.FindElement(cookieConsentButton);
+            wait.Until(d => d.FindElement(cookieConsentButton).Displayed);
+
+            Assert.IsTrue(revealed.Displayed);
+            driver.FindElement(cookieConsentButton).Click();
+
+            Console.WriteLine("Waited 30 seconds");
+            // Get all available cookies
+            // That line is a lie. the third-party ones are ignored.
+            IReadOnlyCollection<Cookie> cookies = driver.Manage().Cookies.AllCookies;
+            foreach (var cookie in cookies)
+            {
+                Console.WriteLine($"Name: {cookie.Name}, Value: {cookie.Value}, SameSite: {cookie.SameSite}, Secure: {cookie.Secure}, Domain: {cookie.Domain}, Expiry: {cookie.Expiry}, HTTP only {cookie.IsHttpOnly}");
+                Console.WriteLine(cookie.ToString());
+                Console.WriteLine();
+            }
+        }
+        finally
+        {
+            //    driver.Quit();
+        }
     }
 }
