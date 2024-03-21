@@ -85,4 +85,39 @@ public class UnitTest1
 
         // driver.Quit();
     }
+
+    [TestMethod]
+    public async Task ConsoleLogs()
+    {
+        // An attempt to find issues with third-party cookies by stopping them and see what's in the console
+	// This didn't work as the errors aren't included
+	// There is support for cookies so this could be handled by investigating at a lower level
+
+	// https://www.selenium.dev/documentation/webdriver/browsers/chrome/
+        var options = new ChromeOptions();
+	options.AddArgument("--start-maximized");
+	options.AddArgument("--test-third-party-cookie-phaseout");
+        IWebDriver driver = new ChromeDriver(options);
+        // IWebDriver driver = new FirefoxDriver();
+        // Start at the homepage
+        driver.Navigate().GoToUrl("https://www.port.ac.uk");
+
+	// https://github.com/SeleniumHQ/seleniumhq.github.io/blob/trunk//examples/dotnet/SeleniumDocs/Bidirectional/ChromeDevtools/BidiApiTest.cs#L85-L92
+        using IJavaScriptEngine monitor = new JavaScriptEngine(driver);
+        var messages = new List<string>();
+        monitor.JavaScriptConsoleApiCalled += (_, e) =>
+        {
+            messages.Add(e.MessageContent);
+	    Console.WriteLine(e.MessageContent);
+        };
+
+        await monitor.StartEventMonitoring();
+        // driver.FindElement(By.Id("consoleLog")).Click();
+        // driver.FindElement(By.Id("consoleError")).Click();
+        new WebDriverWait(driver, TimeSpan.FromSeconds(60 * 5)).Until(_ => messages.Count > 50);
+        monitor.StopEventMonitoring();
+
+        Assert.IsTrue(false);
+        driver.Quit();
+    }
 }
